@@ -1,0 +1,11 @@
+env/
+.env
+Dockerfile
+venv
+/venv
+.idea
+/idea
+__pycache__
+/README_DOCKER.md
+.vscode
+.claude

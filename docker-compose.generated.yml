@@ -1,0 +1,134 @@
+version: '3.8'
+services:
+  parser_1:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: parser_1
+    environment:
+      PROXIES_IP: 194.35.113.19,45.140.54.208,188.130.220.48,46.8.11.171,46.8.14.152,45.84.176.54,95.182.127.107,188.130.129.218,188.130.188.107,213.226.101.253
+      PROXY_PORT: 3000
+      PROXY_LOGIN: mSx81Xtb
+      PROXY_PASSWORD: HUmetwMO
+    restart: unless-stopped
+  parser_2:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: parser_2
+    environment:
+      PROXIES_IP: 77.83.148.113,188.130.221.210,2.59.50.193,45.140.53.31,92.119.193.109,188.130.211.99,46.8.157.139,45.140.54.124,2.59.50.194,109.248.167.239
+      PROXY_PORT: 3000
+      PROXY_LOGIN: mSx81Xtb
+      PROXY_PASSWORD: HUmetwMO
+    restart: unless-stopped
+  parser_3:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: parser_3
+    environment:
+      PROXIES_IP: 45.145.117.66,188.130.219.191,185.181.247.194,109.248.129.61,46.8.222.2,46.8.56.10,95.182.125.4,77.83.149.17,77.83.148.171,46.8.111.180
+      PROXY_PORT: 3000
+      PROXY_LOGIN: mSx81Xtb
+      PROXY_PASSWORD: HUmetwMO
+    restart: unless-stopped
+  parser_4:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: parser_4
+    environment:
+      PROXIES_IP: 45.134.181.186,109.248.129.144,45.134.181.142,45.140.54.193,46.8.57.17,188.130.211.85,109.248.49.110,188.130.186.224,188.130.218.194,188.130.187.147
+      PROXY_PORT: 3000
+      PROXY_LOGIN: mSx81Xtb
+      PROXY_PASSWORD: HUmetwMO
+    restart: unless-stopped
+  parser_5:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: parser_5
+    environment:
+      PROXIES_IP: 109.248.166.61,109.248.12.245,45.145.116.13,194.34.248.42,46.8.11.243,109.248.48.190,46.8.212.139,194.35.113.138,188.130.211.73,46.8.10.34
+      PROXY_PORT: 3000
+      PROXY_LOGIN: mSx81Xtb
+      PROXY_PASSWORD: HUmetwMO
+    restart: unless-stopped
+  parser_6:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: parser_6
+    environment:
+      PROXIES_IP: 95.182.127.222,45.140.55.35,45.11.20.229,95.182.126.4,95.182.124.80,45.87.252.15,45.90.196.106,109.248.166.2,46.8.110.5,77.83.149.55
+      PROXY_PORT: 3000
+      PROXY_LOGIN: mSx81Xtb
+      PROXY_PASSWORD: HUmetwMO
+    restart: unless-stopped
+  parser_7:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: parser_7
+    environment:
+      PROXIES_IP: 45.81.136.174,194.32.229.85,45.140.55.42,188.130.185.176,46.8.213.240,194.35.113.22,46.8.10.122,46.8.56.80,188.130.219.86,45.134.182.121
+      PROXY_PORT: 3000
+      PROXY_LOGIN: mSx81Xtb
+      PROXY_PASSWORD: HUmetwMO
+    restart: unless-stopped
+  parser_8:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: parser_8
+    environment:
+      PROXIES_IP: 109.248.12.248,188.130.142.134,46.8.106.234,45.145.118.7,185.181.246.214,194.32.229.18,188.130.189.95,109.248.205.117,95.182.126.206,46.8.222.63
+      PROXY_PORT: 3000
+      PROXY_LOGIN: mSx81Xtb
+      PROXY_PASSWORD: HUmetwMO
+    restart: unless-stopped
+  parser_9:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: parser_9
+    environment:
+      PROXIES_IP: 109.248.14.11,188.130.129.56,46.8.222.155,188.130.211.8,92.119.193.107,45.134.181.52,46.8.57.75,45.145.118.243,45.140.53.247,109.248.55.179
+      PROXY_PORT: 3000
+      PROXY_LOGIN: mSx81Xtb
+      PROXY_PASSWORD: HUmetwMO
+    restart: unless-stopped
+  parser_10:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: parser_10
+    environment:
+      PROXIES_IP: 45.145.119.17,109.248.129.247,46.8.16.124,46.8.111.199,45.140.53.205,188.130.188.228,212.115.49.81,188.130.221.112,45.15.72.185,46.8.157.154
+      PROXY_PORT: 3000
+      PROXY_LOGIN: mSx81Xtb
+      PROXY_PASSWORD: HUmetwMO
+    restart: unless-stopped
+  parser_11:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: parser_11
+    environment:
+      PROXIES_IP: 46.8.156.136,109.248.142.168,95.182.127.247,188.130.210.33,188.130.136.116,109.248.12.136,188.130.186.42,46.8.157.108,188.130.189.17,46.8.56.104
+      PROXY_PORT: 3000
+      PROXY_LOGIN: mSx81Xtb
+      PROXY_PASSWORD: HUmetwMO
+    restart: unless-stopped
+  parser_12:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: parser_12
+    environment:
+      PROXIES_IP: 95.182.126.105,109.248.129.54,46.8.223.236,46.8.192.6,45.81.137.146,45.134.181.132,109.248.138.86,109.248.166.143,45.134.180.226,46.8.14.93
+      PROXY_PORT: 3000
+      PROXY_LOGIN: mSx81Xtb
+      PROXY_PASSWORD: HUmetwMO
+    restart: unless-stopped
