@@ -129,7 +129,7 @@ class CommerceParse(BaseParser):
             case "другое":
                 self.purpose = Purpose.other
             case _:
-                raise ParserError(f'Неизвестный тип недвижимости: "{purpose_text}"')
+                logger.error(f'Неизвестный тип недвижимости: "{purpose_text}"')
 
     def __extract_land_area(self):
         land_area_match = re.search(r"Участок: ([\d\s]+(?:\.\d+)?)", self.html)
@@ -150,7 +150,7 @@ class CommerceParse(BaseParser):
         html_normalized = self.html.replace("\xa0", " ")
 
         # Поиск цены в формате "850 000 у.е."
-        total_price_match = re.search(r"([\d\s]+)\s*у\.е\.", html_normalized)
+        total_price_match = re.search(r">([\d\s]+)\sу\.е\.", html_normalized)
         if total_price_match:
             total_price_str = total_price_match.group(1).replace(" ", "")
             try:
@@ -160,7 +160,8 @@ class CommerceParse(BaseParser):
                 raise ParserError(f"Не удалось преобразовать цену в int: {total_price_str}") from e
 
         # Поиск цены в формате "850 000 $" или "850 000 сум"
-        total_price_match = re.search(r"([\d\s]+)\s*(?:\$|сум)", html_normalized)
+        total_price_match = re.search(r">([\d\s]+)\sсум", html_normalized)
+        print(total_price_match)
         if total_price_match:
             total_price_str = total_price_match.group(1).replace(" ", "")
             try:

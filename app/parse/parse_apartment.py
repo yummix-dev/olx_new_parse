@@ -46,7 +46,8 @@ class ApartmentParse(BaseParser):
         floor_match = re.search(r"Этаж: (\d+)", self.html)
 
         if not floor_match:
-            raise ParserError('Не найден элемент "Этаж"')
+            logger.warning('Не найден элемент "Этаж"')
+            return
 
         self.floor = int(floor_match.group(1))
 
@@ -134,7 +135,8 @@ class ApartmentParse(BaseParser):
         furniture_match = re.search(r"Меблирована:\s*([А-Я]{1,}[^А-Я]+)", self.html)
 
         if not furniture_match:
-            raise ParserError('Не удалось найти элемент "Меблирована"')
+            logger.warning('Не удалось найти элемент "Меблирована"')
+            return
 
         self.has_furniture = True if furniture_match.group(1) == "Да" else False
 
