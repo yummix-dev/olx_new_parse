@@ -153,9 +153,10 @@ class ApartmentParse(BaseParser):
                 raise ParserError(f"Не удалось преобразовать цену в int: {total_price_str}") from e
 
         # Поиск цены в формате "850 000 $" или "850 000 сум"
-        total_price_match = re.search(r"([\d\s]+)\s*(?:\$|сум)", html_normalized)
+        total_price_match = re.search(r"([\d\s]+)\sсум", html_normalized)
         if total_price_match:
             total_price_str = total_price_match.group(1).replace(" ", "")
+            logger.error(total_price_str)
             try:
                 price = int(total_price_str)
                 if "сум" in total_price_match.group(0):
