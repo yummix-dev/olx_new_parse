@@ -59,7 +59,7 @@ class ApartmentParse(BaseParser):
         self.total_floor = int(total_floor_match.group(1))
 
     def __extract_total_area(self):
-        total_area_matches = re.search(r"Общая площадь: ([\d\s]+(?:\.\d+)?)", self.html)
+        total_area_matches = re.search(r">Общая площадь: ([\d\s]+)", self.html)
         if not total_area_matches:
             raise ParserError('Не найден элемент "Общая площадь"')
 
@@ -158,7 +158,6 @@ class ApartmentParse(BaseParser):
         total_price_match = re.search(r"([\d\s]+)\sсум", html_normalized)
         if total_price_match:
             total_price_str = total_price_match.group(1).replace(" ", "")
-            logger.error(total_price_str)
             try:
                 price = int(total_price_str)
                 if "сум" in total_price_match.group(0):
