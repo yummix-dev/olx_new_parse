@@ -99,6 +99,8 @@ class HouseParse(BaseParser):
                 self.repair = Repair.average
             elif "не достроен" in repair_text:
                 self.repair = Repair.needs_repair
+            elif "под снос" in repair_text:
+                self.repair = Repair.needs_repair
             elif "требует ремонта" in repair_text:
                 self.repair = Repair.needs_repair
             elif "черновая отделка" in repair_text:
@@ -127,6 +129,8 @@ class HouseParse(BaseParser):
             elif "средний" in repair_text:
                 self.repair = Repair.average
             elif "не достроен" in repair_text:
+                self.repair = Repair.needs_repair
+            elif "под снос" in repair_text:
                 self.repair = Repair.needs_repair
             elif "требует ремонта" in repair_text:
                 self.repair = Repair.needs_repair
