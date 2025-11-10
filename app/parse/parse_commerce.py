@@ -124,6 +124,8 @@ class CommerceParse(BaseParser):
                 self.purpose = Purpose.part_of_building
             case "отдельно стоящие здания":
                 self.purpose = Purpose.standalone_building
+            case "нежилое помещение":
+                self.purpose = Purpose.uninhabitable
             case "другое":
                 self.purpose = Purpose.other
             case _:

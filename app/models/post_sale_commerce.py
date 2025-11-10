@@ -20,6 +20,7 @@ class Purpose(str, enum.Enum):
     warehouse = "склады"
     part_of_building = "часть здания"
     standalone_building = "отдельно стоящее здание"
+    uninhabitable = "нежилое помещение"
     other = "другое"
 
 
