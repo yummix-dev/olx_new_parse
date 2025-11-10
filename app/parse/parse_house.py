@@ -110,7 +110,7 @@ class HouseParse(BaseParser):
             elif "предчистовая отделка" in repair_text:
                 self.repair = Repair.pre_finish
             else:
-                raise ParserError(f'Неизвестный тип ремонта: "{repair_text}"')
+                logger.error(f'Неизвестный тип ремонта: "{repair_text}"')
         else:
             logger.warning('Не найден элемент "Ремонт" или "Состояние дома"')
 
@@ -143,7 +143,7 @@ class HouseParse(BaseParser):
             elif "предчистовая отделка" in repair_text:
                 self.repair = Repair.pre_finish
             else:
-                raise ParserError(f'Неизвестный тип ремонта: "{repair_text}"')
+                logger.error(f'Неизвестный тип ремонта: "{repair_text}"')
         else:
             logger.warning('Не найден элемент "Ремонт" или "Состояние дома"')
 

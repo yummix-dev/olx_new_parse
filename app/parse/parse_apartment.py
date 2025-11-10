@@ -143,9 +143,11 @@ class ApartmentParse(BaseParser):
         html_normalized = self.html.replace("\xa0", " ")
 
         # Поиск цены в формате "850 000 у.е."
-        total_price_match = re.search(r"([\d\s]+)\s*у\.е\.", html_normalized)
+        total_price_match = re.search(r"([\d\s]+)\sу\.е\.", html_normalized)
+
         if total_price_match:
-            total_price_str = total_price_match.group(1).replace(" ", "")
+            total_price_str = total_price_match.group(1)
+            total_price_str = re.search(r"\d+", total_price_str).group(0).replace(" ", "")
             try:
                 self.total_price = int(total_price_str)
                 return
