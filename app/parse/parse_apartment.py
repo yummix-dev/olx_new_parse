@@ -19,7 +19,7 @@ config = load_config()
 
 
 class ApartmentParse(BaseParser):
-    type_of_property=TypeOfProperty.APARTMENT.value
+    type_of_property = TypeOfProperty.APARTMENT.value
 
     def __init__(self, url: str, soup: BeautifulSoup, session: aiohttp.ClientSession):
         super().__init__(url, soup, session)
@@ -220,6 +220,7 @@ class ApartmentParse(BaseParser):
 
             if existing_post:
                 logger.info(f"Пост {self.external_id} уже существует в БД, пропускаем")
+                await session.remove()
                 return
 
             # 3. Создаем новый пост

@@ -1,4 +1,5 @@
 import asyncio
+import gc
 from random import randint
 from urllib.parse import urlparse
 import aio_pika
@@ -64,26 +65,37 @@ async def fetch_with_cloudscraper(url: str, proxy_ip: str, headers: dict, timeou
     """
 
     def _fetch():
-        if config.proxy.login and config.proxy.password:
-            proxy_with_auth = f"http://{config.proxy.login}:{config.proxy.password}@{proxy_ip}:{config.proxy.port}"
-        else:
-            proxy_with_auth = f"http://{proxy_ip}:{config.proxy.port}"
+        scraper = None
+        try:
+            if config.proxy.login and config.proxy.password:
+                proxy_with_auth = f"http://{config.proxy.login}:{config.proxy.password}@{proxy_ip}:{config.proxy.port}"
+            else:
+                proxy_with_auth = f"http://{proxy_ip}:{config.proxy.port}"
 
-        proxies = {"http": proxy_with_auth, "https": proxy_with_auth}
+            proxies = {"http": proxy_with_auth, "https": proxy_with_auth}
 
-        scraper = cloudscraper.create_scraper(browser={"browser": "chrome", "platform": "windows", "mobile": False})
-        scraper.proxies = proxies
+            scraper = cloudscraper.create_scraper(browser={"browser": "chrome", "platform": "windows", "mobile": False})
+            scraper.proxies = proxies
 
-        response = scraper.get(url, headers=headers, timeout=timeout)
-        return response.status_code, response.text
+            response = scraper.get(url, headers=headers, timeout=timeout)
+            return response.status_code, response.text
+        finally:
+            # Явно закрываем scraper для освобождения ресурсов
+            if scraper is not None:
+                try:
+                    scraper.close()
+                except Exception:
+                    pass
 
     # Выполняем синхронный код в отдельном потоке, чтобы не блокировать event loop
     return await asyncio.to_thread(_fetch)
 
 
-async def process_message(message: aio_pika.IncomingMessage):
+async def process_message(message: aio_pika.IncomingMessage, session: aiohttp.ClientSession):
     """Обрабатывает одно сообщение из очереди"""
     url = message.body.decode()
+    soup = None
+    post = None
 
     try:
         URLValidator(url=url)
@@ -95,9 +107,9 @@ async def process_message(message: aio_pika.IncomingMessage):
     max_retries = min(config.parser.max_retries, len(_proxy.proxies))
     headers = get_headers()
 
-    async with aiohttp.ClientSession() as session:
-        proxy_ip = _proxy.get()
+    proxy_ip = _proxy.get()
 
+    try:
         for attempt in range(max_retries):
             logger.info(f"Используется прокси {proxy_ip} (попытка {attempt + 1}/{max_retries})")
 
@@ -159,6 +171,15 @@ async def process_message(message: aio_pika.IncomingMessage):
         # Если все попытки исчерпаны
         logger.error(f"Не удалось обработать URL после {max_retries} попыток: {url}")
         await message.nack(requeue=True)
+    finally:
+        # Явно очищаем объекты для освобождения памяти
+        if soup is not None:
+            soup.decompose()
+            del soup
+        if post is not None:
+            del post
+        # Принудительная сборка мусора каждые N сообщений
+        gc.collect()
 
 
 async def main():
@@ -173,23 +194,33 @@ async def main():
     )
     connection = await aio_pika.connect_robust(rabbitmq_url)
 
+    # Создаем одну долгоживущую aiohttp сессию для всех запросов
+    connector = aiohttp.TCPConnector(
+        limit=10,  # Максимум 10 одновременных соединений
+        limit_per_host=5,  # Максимум 5 соединений на хост
+        ttl_dns_cache=300,  # Кэшируем DNS на 5 минут
+        force_close=True  # Закрываем соединения после каждого запроса
+    )
+    timeout = aiohttp.ClientTimeout(total=config.parser.request_timeout)
+
     try:
-        channel = await connection.channel()
-        await channel.set_qos(prefetch_count=1)  # Обрабатываем по одному сообщению за раз
-        queue = await channel.declare_queue("post", durable=True)
+        async with aiohttp.ClientSession(connector=connector, timeout=timeout) as session:
+            channel = await connection.channel()
+            await channel.set_qos(prefetch_count=1)  # Обрабатываем по одному сообщению за раз
+            queue = await channel.declare_queue("post", durable=True)
 
-        logger.info("Ожидание сообщений из очереди...")
+            logger.info("Ожидание сообщений из очереди...")
 
-        async with queue.iterator(no_ack=False) as queue_iter:
-            async for message in queue_iter:
-                try:
-                    await process_message(message)
-                except Exception as e:
-                    logger.error(f"Критическая ошибка при обработке сообщения: {e}")
+            async with queue.iterator(no_ack=False) as queue_iter:
+                async for message in queue_iter:
                     try:
-                        await message.nack(requeue=True)
-                    except Exception as nack_error:
-                        logger.error(f"Не удалось вернуть сообщение в очередь: {nack_error}")
+                        await process_message(message, session)
+                    except Exception as e:
+                        logger.error(f"Критическая ошибка при обработке сообщения: {e}")
+                        try:
+                            await message.nack(requeue=True)
+                        except Exception as nack_error:
+                            logger.error(f"Не удалось вернуть сообщение в очередь: {nack_error}")
 
     except KeyboardInterrupt:
         logger.info("Получен сигнал остановки...")

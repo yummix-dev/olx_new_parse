@@ -222,6 +222,7 @@ class CommerceParse(BaseParser):
 
             if existing_post:
                 logger.info(f"Пост {self.external_id} уже существует в БД, пропускаем")
+                await session.remove()
                 return
 
             # 3. Создаем новый пост
@@ -294,8 +295,12 @@ async def main():
             soup = BeautifulSoup(page, "lxml")
 
             # Создаем базовый парсер - он сам определит тип и вызовет CommerceParse
+            url = (
+                "https://www.olx.uz/d/obyavlenie/"
+                "assalomu-aleykum-kimga-taer-ishlab-turgan-biznes-kizik-bulsa-ID4cTue.html"
+            )
             result = await BaseParser(
-                url="https://www.olx.uz/d/obyavlenie/assalomu-aleykum-kimga-taer-ishlab-turgan-biznes-kizik-bulsa-ID4cTue.html",
+                url=url,
                 soup=soup,
                 session=session,
             ).execute()

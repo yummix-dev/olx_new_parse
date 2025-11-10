@@ -301,6 +301,7 @@ class HouseParse(BaseParser):
 
             if existing_post:
                 logger.info(f"Пост {self.external_id} уже существует в БД, пропускаем")
+                await session.remove()
                 return
 
             # 3. Создаем новый пост
@@ -373,8 +374,12 @@ async def main():
             soup = BeautifulSoup(page, "lxml")
 
             # Создаем базовый парсер - он сам определит тип и вызовет HouseParse
+            url = (
+                "https://www.olx.uz/d/obyavlenie/"
+                "ipoteka-sotiladi-dacha-hovli-5-25sot-bstonli-tumani-bayt-uron-ID48x54.html"
+            )
             result = await BaseParser(
-                url="https://www.olx.uz/d/obyavlenie/ipoteka-sotiladi-dacha-hovli-5-25sot-bstonli-tumani-bayt-uron-ID48x54.html",
+                url=url,
                 soup=soup,
                 session=session,
             ).execute()
