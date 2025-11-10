@@ -1,7 +1,7 @@
 import aiohttp
 import logging
 
-from core.config import load_config
+from ..core.config import load_config
 
 config = load_config()
 logger = logging.getLogger(__name__)

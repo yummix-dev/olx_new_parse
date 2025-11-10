@@ -1,7 +1,7 @@
 from pydantic import BaseModel
 
-from models.post_sale_apartment import BuildingMaterial, Repair
-from models.post_sale_house import HouseType
+from ..models.post_sale_apartment import BuildingMaterial, Repair
+from ..models.post_sale_house import HouseType
 
 
 class PostHouse(BaseModel):

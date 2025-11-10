@@ -5,10 +5,10 @@ from bs4 import BeautifulSoup
 from fastapi import HTTPException
 from loguru import logger
 
-from exception import ParserError
-from misc.clean_text import clean_text
-from models.post import TypeOfProperty, TypeOfService
-from core.config import load_config
+from ..exception import ParserError
+from ..misc.clean_text import clean_text
+from ..models.post import TypeOfProperty, TypeOfService
+from ..core.config import load_config
 
 config = load_config()
 
@@ -16,13 +16,12 @@ config = load_config()
 class BaseParser:
     registry = {}
 
-    def __init_subclass__(cls, type_of_property=None, **kwargs):
+    def __init_subclass__(cls, **kwargs):
         """Регистрирует дочерние парсеры по типу недвижимости"""
         super().__init_subclass__(**kwargs)
-        if type_of_property:
-            BaseParser.registry[type_of_property] = cls
-
-        logger.debug(BaseParser.registry)
+        if hasattr(cls, "type_of_property"):
+            BaseParser.registry[cls.type_of_property] = cls
+            logger.info(f"Registered: {cls.type_of_property} -> {cls.__name__}")
 
     def __init__(
         self,
@@ -59,6 +58,8 @@ class BaseParser:
             case "продажа":
                 self.type_of_service = TypeOfService.SALE.value
             case "аренда долгосрочная":
+                self.type_of_service = TypeOfService.RENT.value
+            case "аренда":
                 self.type_of_service = TypeOfService.RENT.value
             case "обмен":
                 self.type_of_service = TypeOfService.SALE.value

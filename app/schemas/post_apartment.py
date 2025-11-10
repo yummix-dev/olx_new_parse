@@ -1,5 +1,5 @@
-from models.post_sale_apartment import BuildingMaterial, Repair
-from schemas.post import Post
+from ..models.post_sale_apartment import BuildingMaterial, Repair
+from .post import Post
 
 
 class PostApartment(Post):

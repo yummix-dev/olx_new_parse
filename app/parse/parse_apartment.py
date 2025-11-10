@@ -6,19 +6,21 @@ from bs4 import BeautifulSoup
 from loguru import logger
 from sqlalchemy import and_
 
-from exception import ParserError
-from schemas.post_apartment import PostApartment as PostApartmentSchemas
-from core.config import load_config
-from models.post_sale_apartment import BuildingMaterial, Repair
-from models.post import TypeOfProperty
-from parse.parse_post import BaseParser
-from misc.convert_to_usd import convert_uzs_to_usd
+from ..exception import ParserError
+from ..schemas.post_apartment import PostApartment as PostApartmentSchemas
+from ..core.config import load_config
+from ..models.post_sale_apartment import BuildingMaterial, Repair
+from ..models.post import TypeOfProperty
+from .parse_post import BaseParser
+from ..misc.convert_to_usd import convert_uzs_to_usd
 
 # Загружаем конфигурацию
 config = load_config()
 
 
-class ApartmentParse(BaseParser, type_of_property=TypeOfProperty.APARTMENT.value):
+class ApartmentParse(BaseParser):
+    type_of_property=TypeOfProperty.APARTMENT.value
+
     def __init__(self, url: str, soup: BeautifulSoup, session: aiohttp.ClientSession):
         super().__init__(url, soup, session)
 
@@ -184,11 +186,11 @@ class ApartmentParse(BaseParser, type_of_property=TypeOfProperty.APARTMENT.value
     async def send_db(self):
         """Сохраняет спарсенные данные в базу данных"""
         from sqlalchemy import select
-        from models.db_helper import db_helper
-        from models.post import Post, Source, TypeOfService
-        from models.post_sale_apartment import PostSaleApartment
-        from models.post_rent_apartment import PostRentApartment
-        from models.organization import Organization, Platform
+        from ..models.db_helper import db_helper
+        from ..models.post import Post, Source, TypeOfService
+        from ..models.post_sale_apartment import PostSaleApartment
+        from ..models.post_rent_apartment import PostRentApartment
+        from ..models.organization import Organization, Platform
 
         session = db_helper.get_scope_session()
 
@@ -270,7 +272,7 @@ class ApartmentParse(BaseParser, type_of_property=TypeOfProperty.APARTMENT.value
 
         except Exception as e:
             await session.rollback()
-            logger.error(f"Ошибка при сохранении квартиры в БД: {e}")
+            logger.error(f": Ошибка при сохранении квартиры в БД: {e}")
             raise
         finally:
             await session.remove()

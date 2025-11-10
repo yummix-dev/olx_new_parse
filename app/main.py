@@ -8,16 +8,16 @@ from bs4 import BeautifulSoup
 from loguru import logger
 from pydantic import BaseModel, field_validator
 
-from core.config import load_config
-from exception import ParserError
-from misc.proxy import Proxy
+from .core.config import load_config
+from .exception import ParserError
+from .misc.proxy import Proxy
 from fake_useragent import UserAgent
 import cloudscraper
 
-from parse.parse_post import BaseParser
+from .parse.parse_post import BaseParser
 
 # Import parse subclasses to register them in BaseParser.registry
-import parse  # noqa: F401
+from . import parse  # noqa: F401
 
 # Загружаем конфигурацию
 config = load_config()

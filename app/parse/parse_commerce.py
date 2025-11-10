@@ -6,20 +6,22 @@ from bs4 import BeautifulSoup
 from loguru import logger
 from sqlalchemy import and_
 
-from exception import ParserError
-from models.post_sale_apartment import Repair
-from models.post_sale_commerce import Purpose
-from schemas.post_commerce import PostCommerce as PostCommerceSchemas
-from core.config import load_config
-from models.post import TypeOfProperty
-from parse.parse_post import BaseParser
-from misc.convert_to_usd import convert_uzs_to_usd
+from ..exception import ParserError
+from ..models.post_sale_apartment import Repair
+from ..models.post_sale_commerce import Purpose
+from ..schemas.post_commerce import PostCommerce as PostCommerceSchemas
+from ..core.config import load_config
+from ..models.post import TypeOfProperty
+from .parse_post import BaseParser
+from ..misc.convert_to_usd import convert_uzs_to_usd
 
 # Загружаем конфигурацию
 config = load_config()
 
 
-class CommerceParse(BaseParser, type_of_property=TypeOfProperty.COMMERCE.value):
+class CommerceParse(BaseParser):
+    type_of_property = TypeOfProperty.COMMERCE.value
+
     def __init__(self, url: str, soup: BeautifulSoup, session: aiohttp.ClientSession):
         super().__init__(url, soup, session)
 
@@ -120,7 +122,7 @@ class CommerceParse(BaseParser, type_of_property=TypeOfProperty.COMMERCE.value):
                 self.purpose = Purpose.warehouse
             case "часть здания":
                 self.purpose = Purpose.part_of_building
-            case "отдельно стоящее здание":
+            case "отдельно стоящие здания":
                 self.purpose = Purpose.standalone_building
             case "другое":
                 self.purpose = Purpose.other
@@ -187,11 +189,11 @@ class CommerceParse(BaseParser, type_of_property=TypeOfProperty.COMMERCE.value):
     async def send_db(self):
         """Сохраняет спарсенные данные в базу данных"""
         from sqlalchemy import select
-        from models.db_helper import db_helper
-        from models.post import Post, Source, TypeOfService
-        from models.post_sale_commerce import PostSaleCommerce
-        from models.post_rent_commerce import PostRentCommerce
-        from models.organization import Organization, Platform
+        from ..models.db_helper import db_helper
+        from ..models.post import Post, Source, TypeOfService
+        from ..models.post_sale_commerce import PostSaleCommerce
+        from ..models.post_rent_commerce import PostRentCommerce
+        from ..models.organization import Organization, Platform
 
         session = db_helper.get_scope_session()
 

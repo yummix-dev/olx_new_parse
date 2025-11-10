@@ -7,7 +7,7 @@ from sqlalchemy.ext.asyncio import (
     AsyncSession,
 )
 from asyncio import current_task
-from core.config import load_config
+from ..core.config import load_config
 
 config = load_config()
 

@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-from models.post import Source, Status, TypeOfProperty, TypeOfService
+from ..models.post import Source, Status, TypeOfProperty, TypeOfService
 
 
 class Post(BaseModel):

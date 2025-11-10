@@ -6,20 +6,22 @@ from bs4 import BeautifulSoup
 from loguru import logger
 from sqlalchemy import and_
 
-from exception import ParserError
-from schemas.post_house import PostHouse as PostHouseSchemas
-from core.config import load_config
-from models.post import TypeOfProperty
-from models.post_sale_apartment import Repair, BuildingMaterial
-from models.post_sale_house import HouseType
-from parse.parse_post import BaseParser
-from misc.convert_to_usd import convert_uzs_to_usd
+from ..exception import ParserError
+from ..schemas.post_house import PostHouse as PostHouseSchemas
+from ..core.config import load_config
+from ..models.post import TypeOfProperty
+from ..models.post_sale_apartment import Repair, BuildingMaterial
+from ..models.post_sale_house import HouseType
+from .parse_post import BaseParser
+from ..misc.convert_to_usd import convert_uzs_to_usd
 
 # Загружаем конфигурацию
 config = load_config()
 
 
-class HouseParse(BaseParser, type_of_property=TypeOfProperty.HOUSE.value):
+class HouseParse(BaseParser):
+    type_of_property = TypeOfProperty.HOUSE.value
+
     def __init__(self, url: str, soup: BeautifulSoup, session: aiohttp.ClientSession):
         super().__init__(url, soup, session)
 
@@ -85,17 +87,23 @@ class HouseParse(BaseParser, type_of_property=TypeOfProperty.HOUSE.value):
             repair_clean = re.sub(r"<[^>]+>", "", repair_match.group(1))
             repair_text = " ".join(repair_clean.split()).strip().lower()
 
-            if Repair.designer.value in repair_text:
+            if "авторский проект" in repair_text:
                 self.repair = Repair.designer
-            elif Repair.euro.value in repair_text:
+            elif "евроремонт" in repair_text:
                 self.repair = Repair.euro
-            elif Repair.average.value in repair_text:
+            elif "евро" in repair_text:
+                self.repair = Repair.euro
+            elif "средний ремонт" in repair_text:
                 self.repair = Repair.average
-            elif Repair.needs_repair.value in repair_text:
+            elif "средний" in repair_text:
+                self.repair = Repair.average
+            elif "не достроен" in repair_text:
                 self.repair = Repair.needs_repair
-            elif Repair.rough_finish.value in repair_text:
+            elif "требует ремонта" in repair_text:
+                self.repair = Repair.needs_repair
+            elif "черновая отделка" in repair_text:
                 self.repair = Repair.rough_finish
-            elif Repair.pre_finish.value in repair_text:
+            elif "предчистовая отделка" in repair_text:
                 self.repair = Repair.pre_finish
             else:
                 raise ParserError(f'Неизвестный тип ремонта: "{repair_text}"')
@@ -112,8 +120,14 @@ class HouseParse(BaseParser, type_of_property=TypeOfProperty.HOUSE.value):
                 self.repair = Repair.designer
             elif "евроремонт" in repair_text:
                 self.repair = Repair.euro
+            elif "евро" in repair_text:
+                self.repair = Repair.euro
             elif "средний ремонт" in repair_text:
                 self.repair = Repair.average
+            elif "средний" in repair_text:
+                self.repair = Repair.average
+            elif "не достроен" in repair_text:
+                self.repair = Repair.needs_repair
             elif "требует ремонта" in repair_text:
                 self.repair = Repair.needs_repair
             elif "черновая отделка" in repair_text:
@@ -246,11 +260,11 @@ class HouseParse(BaseParser, type_of_property=TypeOfProperty.HOUSE.value):
     async def send_db(self):
         """Сохраняет спарсенные данные в базу данных"""
         from sqlalchemy import select
-        from models.db_helper import db_helper
-        from models.post import Post, Source, TypeOfService
-        from models.post_sale_house import PostSaleHouse
-        from models.post_rent_house import PostRentHouse
-        from models.organization import Organization, Platform
+        from ..models.db_helper import db_helper
+        from ..models.post import Post, Source, TypeOfService
+        from ..models.post_sale_house import PostSaleHouse
+        from ..models.post_rent_house import PostRentHouse
+        from ..models.organization import Organization, Platform
 
         session = db_helper.get_scope_session()
 
